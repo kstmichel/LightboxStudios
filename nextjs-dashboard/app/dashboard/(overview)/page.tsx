@@ -13,6 +13,33 @@ export default async function Page() {
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
         Dashboard
       </h1>
+      <h2>
+        Goals: 
+      </h2>
+      <ul>
+        <ol>
+          <li>1. Create better navigation
+            <ul>
+              <li>Resume</li>
+              <li>Portfolio - this page will have sub navigation (Development, Graphic Art, Painting), and will have drawer for each 
+                project. Each project will have a sub navigation for the following:
+                <ul>
+                  <li>Project Overview</li>
+                  <li>Project Details</li>
+                  <li>Project Images</li>
+                  <li>Project Videos</li>
+                  <li>Project Files</li>
+                  <li>Project Skills</li>
+                </ul>
+              </li>
+              <li>Contact</li>
+            </ul>
+          </li>
+          <li>2. Create better layout</li>
+          <li>3. Featured section on homepage</li>
+          <li>4. Authentication / Login</li>
+        </ol>
+      </ul>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <Suspense fallback={<CardsSkeleton />}>
           <CardWrapper />
