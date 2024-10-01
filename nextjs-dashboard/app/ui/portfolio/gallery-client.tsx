@@ -12,7 +12,7 @@ export default function GalleryClient({projects}: GalleryClientProps) {
     console.log('gallery client!');
 
     const onClickHandler = (e: React.MouseEvent<HTMLImageElement>) => {
-        console.log('Image clicked');
+        console.log('Image clicked', e);
     };
 
    return (
@@ -30,9 +30,9 @@ export default function GalleryClient({projects}: GalleryClientProps) {
                         />
                         <h5>{project.title}</h5>
                     </ImageListItem>
-                    {/* <Suspense key={`skills_p${project.id}`} fallback={<div>Skills Loading...</div>}>
+                    <Suspense key={`skills_p${project.id}`} fallback={<div>Skills Loading...</div>}>
                         <Skills projectID={project.id} />
-                    </Suspense> */}
+                    </Suspense>
                 </div>
               ))}
         </ImageList>
