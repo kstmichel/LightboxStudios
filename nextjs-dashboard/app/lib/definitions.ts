@@ -1,6 +1,9 @@
 // This file contains type definitions for your data.
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
+
+import { string } from "zod";
+
 // However, these types are generated automatically if you're using an ORM such as Prisma.
 export type User = {
   id: string;
@@ -85,4 +88,52 @@ export type InvoiceForm = {
   customer_id: string;
   amount: number;
   status: 'pending' | 'paid';
+};
+
+
+export type PortfolioPanel = {
+    id: string;  
+    value: number;
+    title: string;
+    description: string;
+}
+
+export type TabPanelProps = {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+export type Skill = {
+  id: number;
+  name: string;
+  icon_url: string;
+  level: 1 | 2 | 3 | 4 | 5;
+}
+
+export type SkillTable = {
+  id: string;
+  name: string;
+  icon_url: string;
+  level: number;
+}
+
+export type Project = {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  alt: string;
+  type: 'web_development' | 'game' | 'ui_design'
+  skills: string[];
+};
+
+export type ProjectTable = {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  alt: string;
+  type: 'web_development' | 'game' | 'ui_design'
+  skills: string;
 };

@@ -13,13 +13,14 @@ import clsx from 'clsx';
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
 const links = [
-  { name: 'Home', href: '/dashboard', icon: HomeIcon },
+  { name: 'home', href: '/dashboard' },
+  { name: 'portfolio', href: '/dashboard/portfolio' },
+  { name: 'resume', href: '/dashboard/resume' },
   {
-    name: 'Invoices',
-    href: '/dashboard/invoices',
-    icon: DocumentDuplicateIcon,
+    name: 'invoices',
+    href: '/dashboard/invoices'
   },
-  { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+  { name: 'customers', href: '/dashboard/customers' },
 ];
 
 export default function NavLinks() {
@@ -28,18 +29,16 @@ export default function NavLinks() {
   return (
     <>
       {links.map((link) => {
-        const LinkIcon = link.icon;
+        const linkColor = pathname === link.href ? 'text-pink-600' : 'text-blue-400';
+
         return (
           <Link
             key={link.name}
             href={link.href}
-            className={clsx('flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3',
-              {
-                'bg-sky-100 text-blue-600': pathname === link.href
-              }
+            className={clsx(`flex h-[48px] grow items-center justify-center p-3 text-sm font-medium hover:text-blue-300 md:flex-none md:justify-start md:p-2 md:px-3 ${linkColor}`
             )}
           >
-            <LinkIcon className="w-6" />
+            {/* <LinkIcon className="w-6" /> */}
             <p className="hidden md:block">{link.name}</p>
           </Link>
         );

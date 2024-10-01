@@ -6,6 +6,9 @@ import {
   InvoicesTable,
   LatestInvoiceRaw,
   Revenue,
+  Project,
+  ProjectTable,
+  Skill,
 } from './definitions';
 import { formatCurrency } from './utils';
 
@@ -25,6 +28,66 @@ export async function fetchRevenue() {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch revenue data.');
+  }
+}
+
+export async function fetchSkillsByProject(projectID: string) {
+  try {
+    console.log('Fetching skills by project data...', projectID);
+
+    const data = await sql<Skill>`
+      SELECT skills.*
+      FROM skills
+      JOIN projects ON skills.id = ANY(regexp_split_to_array(projects.skills, ',')::uuid[])
+      WHERE projects.id = ${projectID}::uuid
+  `
+
+    console.log('Data fetch completed after 3 seconds.');
+
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch skills data.');
+  }
+}
+
+export async function fetchGalleryProjectsByCategory(query: string, page: number) {
+  console.log('Fetching projects data...', 'query:', query, 'page:', page);
+
+   const queryString = query.replace('-', '_');
+   console.log('query changed', queryString);
+   
+   const data = await sql<ProjectTable>`SELECT * FROM projects
+      WHERE type ILIKE ${`%${queryString}%`}
+      ORDER BY title ASC
+      LIMIT 6 OFFSET ${(page - 1) * 6}`;
+
+      console.log('data', data.rows);
+
+  return data.rows.map((project: ProjectTable) => ({
+    ...project,
+    skills: project.skills.split(','),
+  } as Project));
+};
+
+export async function fetchPortfolioPages(query: string) {
+  try {
+    const count = await sql`SELECT COUNT(*)
+    FROM invoices
+    JOIN customers ON invoices.customer_id = customers.id
+    WHERE
+      customers.name ILIKE ${`%${query}%`} OR
+      customers.email ILIKE ${`%${query}%`} OR
+      invoices.amount::text ILIKE ${`%${query}%`} OR
+      invoices.date::text ILIKE ${`%${query}%`} OR
+      invoices.status ILIKE ${`%${query}%`}
+  `;
+
+    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of invoices.');
   }
 }
 

@@ -13,10 +13,14 @@ const config: Config = {
       },
       colors: {
         blue: {
-          400: '#2589FE',
+          300: '#f2f7f8',
+          400: '#b7c8ff',
           500: '#0070F3',
           600: '#2F6FEB',
         },
+        grey: {
+          600: '#040508',
+        }
       },
     },
     keyframes: {

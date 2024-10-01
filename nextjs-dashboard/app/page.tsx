@@ -1,28 +1,29 @@
-import AcmeLogo from '@/app/ui/acme-logo';
+import CreativeDevStudioLogo from '@/app/ui/brand-logo';
 import { lusitana } from '@/app/ui/fonts';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 export default function Page() {
   return (
     <main className="flex min-h-screen flex-col p-6"
-      style={{ background: 'linear-gradient(150deg, rgb(16 2 20 / 88%) 20%, rgb(117 25 25 / 78%) 55%, rgb(0 55 255 / 58%) 100%)'}}> 
-      {/* linear-gradient(150deg, rgb(77 3 101 / 80%) 0%, rgb(134 8 175 / 52%) 41%, rgb(0 212 255 / 58%) 100%); */}
-      <Image
+      style={{ background: '#fff' }}>
+      {/* <Image
         src="/MoodySky.jpg"
         width={7654}
         height={1200}
         style={{
           position: 'absolute',
-          top: '-400px',
+          width: '100%',
+          height: 'auto',
+          bottom: '0px',
           left: '0',
           zIndex: '-1'
         }}
         alt="starry mountain"
-      />
+      /> */}
       <div className="flex h-15 shrink-0 p-4">
-        <AcmeLogo />
+        <CreativeDevStudioLogo />
       </div>
 
       <div className="mt-4 flex grow flex-col justify-center gap-4 md:flex-row">
