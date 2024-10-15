@@ -9,8 +9,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body 
-        className={`${inter.className} antialiased text-white`}
-        style={{ backgroundColor: '#02021c' }}
+        className={`${inter.className} background antialiased text-white`}
       >{children}</body>
     </html>
   );

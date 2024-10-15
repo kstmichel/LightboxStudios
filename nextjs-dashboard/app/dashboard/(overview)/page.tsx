@@ -10,22 +10,7 @@ import { RevenueChartSkeleton, LatestInvoicesSkeleton, CardsSkeleton } from '@/a
 export default async function Page() {
 
   return (
-    <main className="flex min-h-screen flex-col p-6"
-    style={{ background: '#fff' }}>
-       <Image
-        src='/CreativeDevStudiosBackground.jpg'
-        width={7654}
-        height={1200}
-        style={{
-          position: 'fixed',
-          width: '100%',
-          top: '0',
-          bottom: '0',
-          left: '0',
-          zIndex: '-1',
-        }}
-        alt='starry sky with coding symbols'
-      />
+    <main className="flex min-h-screen flex-col p-6">
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
         Dashboard
       </h1>

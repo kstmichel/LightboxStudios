@@ -6,22 +6,8 @@ import Link from 'next/link';
 
 export default function Page() {
   return (
-    <main className="flex min-h-screen flex-col p-6"
-      style={{ background: '#fff' }}>
-      {/* <Image
-        src="/MoodySky.jpg"
-        width={7654}
-        height={1200}
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: 'auto',
-          bottom: '0px',
-          left: '0',
-          zIndex: '-1'
-        }}
-        alt="starry mountain"
-      /> */}
+    <main className="flex min-h-screen flex-col p-6">
+     
       <div className="flex h-15 shrink-0 p-4">
         <CreativeDevStudioLogo />
       </div>
