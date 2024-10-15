@@ -1,4 +1,6 @@
 import { sql } from '@vercel/postgres';
+import { validate as isValidUUID, v4 as uuidv4 } from 'uuid';
+
 import {
   CustomerField,
   CustomersTableType,
@@ -7,11 +9,11 @@ import {
   LatestInvoiceRaw,
   Revenue,
   Project,
-  ProjectTable,
+  ProjectData,
   Skill,
 } from './definitions';
 import { formatCurrency } from './utils';
-
+import {UUID} from './definitions';
 export async function fetchRevenue() {
   try {
     // Artificially delay a response for demo purposes.
@@ -31,18 +33,46 @@ export async function fetchRevenue() {
   }
 }
 
-export async function fetchSkillsByProject(projectID: string) {
+export async function fetchSkills(skillNames?: string[]): Promise<Skill[]> {
   try {
-    console.log('Fetching skills by project data...', projectID);
 
-    const data = await sql<Skill>`
-      SELECT skills.*
-      FROM skills
-      JOIN projects ON skills.id = ANY(regexp_split_to_array(projects.skills, ',')::uuid[])
-      WHERE projects.id = ${projectID}::uuid
-  `
+    if (!skillNames || skillNames.length === 0) {
 
-    console.log('Data fetch completed after 3 seconds.');
+      const data = await sql<Skill>`SELECT * FROM skills`;
+
+      return data.rows;
+    }
+    
+    const data = await sql.query(`SELECT * FROM skills
+        WHERE name = ANY($1::text[])`,
+        [skillNames]);
+
+    return data.rows;
+
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch skills data.');
+  }
+}
+
+export async function fetchSkillsByIds(skills: UUID[]): Promise<Skill[]> {
+  try {
+    console.log('Fetching skills by project data...', skills);
+
+    if (!Array.isArray(skills)) {
+      throw new Error('Invalid input: skills must be an array of UUIDs.');
+    }
+    
+    const validSkillsList = skills.filter(skillId => {
+      const isValid = isValidUUID(skillId);
+      return isValid;
+    });
+
+    const data = await sql.query(
+      `SELECT * FROM skills
+       WHERE skills.id = ANY($1::uuid[])`,
+      [validSkillsList]
+    );
 
     return data.rows;
   } catch (error) {
@@ -51,45 +81,64 @@ export async function fetchSkillsByProject(projectID: string) {
   }
 }
 
-export async function fetchGalleryProjectsByCategory(query: string, page: number) {
-  console.log('Fetching projects data...', 'query:', query, 'page:', page);
-
-   const queryString = query.replace('-', '_');
-   console.log('query changed', queryString);
-   
-   const data = await sql<ProjectTable>`SELECT * FROM projects
-      WHERE type ILIKE ${`%${queryString}%`}
-      ORDER BY title ASC
-      LIMIT 6 OFFSET ${(page - 1) * 6}`;
-
-      console.log('data', data.rows);
-
-  return data.rows.map((project: ProjectTable) => ({
-    ...project,
-    skills: project.skills.split(','),
-  } as Project));
-};
-
-export async function fetchPortfolioPages(query: string) {
+export async function fetchProjectById(projectId: string): Promise<Project> {
   try {
-    const count = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
-  `;
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
-    return totalPages;
+    if(!projectId) {
+      throw new Error('No project UUID provided.');
+    }
+
+    // Validate and filter out invalid UUIDs
+    const validProjectId = isValidUUID(projectId);
+   
+    if (!validProjectId) {
+      throw new Error('No valid project UUID provided.');
+    }
+
+    const uuid: UUID = projectId as UUID;
+
+    const data = await sql.query(
+      `SELECT * FROM projects 
+       WHERE id = $1::uuid`,
+      [uuid]
+    );
+    
+    if (data.rows.length === 0) {
+      throw new Error('Project not found');
+    }
+
+    const projectData: ProjectData = {
+      ...data.rows[0],
+      skills: data.rows[0].skills.split(','),
+    };
+
+    const dataSkills: Skill[] = await fetchSkillsByIds(projectData.skills);
+    const project: Project = {
+      ...projectData,
+      skills: dataSkills,
+    };
+
+    return project;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of invoices.');
+    throw new Error('Failed to fetch project data.');
   }
 }
+
+export async function fetchProjectsByPortfolioCategory(query: string, page: number): Promise<ProjectData[]> {
+  try {
+    const data = await sql<ProjectData>`SELECT * FROM projects
+      WHERE type ILIKE ${`%${query}%`}
+      ORDER BY title ASC
+      LIMIT 3 OFFSET ${(page - 1) * 6}`;
+
+    return data.rows;
+    
+  } catch (error) {
+    console.error('Error fetching projects', error);
+    return [];
+  }
+};
 
 export async function fetchLatestInvoices() {
   try {

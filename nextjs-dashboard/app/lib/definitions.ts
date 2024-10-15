@@ -5,6 +5,38 @@
 // import { string } from "zod";
 
 // However, these types are generated automatically if you're using an ORM such as Prisma.
+export type UUID = string;
+
+export const PortfolioTabs: { [key: string]: number } = {
+  web_development: 0,
+  ui_design: 1,
+  game: 2,
+};
+
+export const portfolioPanels: PortfolioPanel[] = [
+  {
+      id: 'web_development',
+      value: PortfolioTabs.web_development,
+      title: 'Web Development',
+      description: 'Projects I have worked on',
+      projects: []
+  },
+  {
+      id: 'ui_design',
+      value: PortfolioTabs.ui_design,
+      title: 'UI Designs',
+      description: 'Designs I have worked on',
+      projects: []
+  },
+  {
+      id: 'games', 
+      value: PortfolioTabs.game, 
+      title: 'Games',
+      description: 'Games I have worked on',
+      projects: []
+  }
+]
+
 export type User = {
   id: string;
   name: string;
@@ -96,6 +128,7 @@ export type PortfolioPanel = {
     value: number;
     title: string;
     description: string;
+    projects: Project[];
 }
 
 export type TabPanelProps = {
@@ -104,19 +137,21 @@ export type TabPanelProps = {
   value: number;
 }
 
+export const SkillLevel = [1, 2, 3, 4, 5];
+
 export type Skill = {
-  id: number;
+  id: string;
   name: string;
   icon_url: string;
   level: 1 | 2 | 3 | 4 | 5;
 }
 
-export type SkillTable = {
-  id: string;
-  name: string;
-  icon_url: string;
-  level: number;
-}
+// export type SkillTable = {
+//   id: string;
+//   name: string;
+//   icon_url: string;
+//   level: number;
+// }
 
 export type Project = {
   id: string;
@@ -125,15 +160,15 @@ export type Project = {
   image_url: string;
   alt: string;
   type: 'web_development' | 'game' | 'ui_design'
-  skills: string[];
+  skills: Skill[];
 };
 
-export type ProjectTable = {
+export type ProjectData = {
   id: string;
   title: string;
   description: string;
   image_url: string;
   alt: string;
-  type: 'web_development' | 'game' | 'ui_design'
-  skills: string;
+  type: "web_development" | "game" | "ui_design";
+  skills: UUID[];
 };

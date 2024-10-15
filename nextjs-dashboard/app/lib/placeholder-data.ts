@@ -1,6 +1,6 @@
 // This file contains placeholder data that you'll be replacing with real data in the Data Fetching chapter:
 // https://nextjs.org/learn/dashboard-app/fetching-data
-import { ProjectTable, SkillTable } from './definitions';
+import { ProjectData, Skill } from './definitions';
 
 const users = [
   {
@@ -146,7 +146,7 @@ const revenue = [
   { month: 'Dec', revenue: 4800 },
 ];
 
-const skills: SkillTable[] = [
+const skills: Skill[] = [
   {
     id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81a1',
     name: 'React',
@@ -167,7 +167,7 @@ const skills: SkillTable[] = [
   },
 ];
 
-const projects: ProjectTable[] = [
+const projects: ProjectData[] = [
   {
     id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81aa',
     title: 'Project 1',
@@ -175,7 +175,7 @@ const projects: ProjectTable[] = [
     image_url: 'https://cdn2.thecatapi.com/images/gl.jpg',
     alt: 'cat image 1',
     type: 'web_development',
-    skills: `${skills[0].id}, ${skills[1].id}`,
+    skills: [skills[0].id, skills[1].id],
   },
   {
     id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81ab',
@@ -184,7 +184,7 @@ const projects: ProjectTable[] = [
     image_url: 'https://cdn2.thecatapi.com/images/282.png',
     alt: 'cat image 2',
     type: 'game',
-    skills: `${skills[0].id}`,
+    skills: [skills[0].id, skills[1].id],
   },
   {
     id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81ac',
@@ -193,7 +193,7 @@ const projects: ProjectTable[] = [
     image_url: 'https://cdn2.thecatapi.com/images/3dp.jpg',
     alt: 'cat image 3',
     type: 'ui_design',
-    skills: `${skills[0].id}, ${skills[1].id}`,
+    skills: [skills[0].id, skills[1].id],
   },
   {
     id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81ad',
@@ -202,7 +202,7 @@ const projects: ProjectTable[] = [
     image_url: 'https://cdn2.thecatapi.com/images/447.jpg',
     alt: 'cat image 4',
     type: 'web_development',
-    skills: `${skills[0].id}`,
+    skills: [skills[0].id, skills[1].id],
   },
   {
     id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81ae',
@@ -211,7 +211,7 @@ const projects: ProjectTable[] = [
     image_url: 'https://cdn2.thecatapi.com/images/6em.jpg',
     alt: 'cat image 5',
     type: 'web_development',
-    skills: `${skills[1].id}`,
+    skills: [skills[0].id, skills[1].id],
   },
   {
     id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81af',
@@ -220,7 +220,7 @@ const projects: ProjectTable[] = [
     image_url: 'https://cdn2.thecatapi.com/images/8os.jpg',
     alt: 'cat image 6',
     type: 'game',
-    skills: `${skills[0].id}, ${skills[1].id}`,
+    skills: [skills[0].id, skills[1].id],
   },
 ];
 

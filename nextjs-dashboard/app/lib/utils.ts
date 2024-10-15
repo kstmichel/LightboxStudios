@@ -1,4 +1,4 @@
-import { Revenue } from './definitions';
+import { Skill, Revenue } from './definitions';
 
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
@@ -6,6 +6,14 @@ export const formatCurrency = (amount: number) => {
     currency: 'USD',
   });
 };
+
+export function debounce(func: (...args: any[]) => void, wait: number) {
+  let timeout: NodeJS.Timeout;
+  return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+  };
+}
 
 export const formatDateToLocal = (
   dateStr: string,
