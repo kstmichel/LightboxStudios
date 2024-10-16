@@ -15,27 +15,27 @@ export const PortfolioTabs: { [key: string]: number } = {
 
 export const portfolioPanels: PortfolioPanel[] = [
   {
-      id: 'web_development',
-      value: PortfolioTabs.web_development,
-      title: 'Web Development',
-      description: 'Projects I have worked on',
-      projects: []
+    id: "web_development",
+    value: PortfolioTabs.web_development,
+    title: "Web Development",
+    description: "Projects I have worked on",
+    projects: [],
   },
   {
-      id: 'ui_design',
-      value: PortfolioTabs.ui_design,
-      title: 'UI Designs',
-      description: 'Designs I have worked on',
-      projects: []
+    id: "ui_design",
+    value: PortfolioTabs.ui_design,
+    title: "UI Designs",
+    description: "Designs I have worked on",
+    projects: [],
   },
   {
-      id: 'games', 
-      value: PortfolioTabs.game, 
-      title: 'Games',
-      description: 'Games I have worked on',
-      projects: []
-  }
-]
+    id: "games",
+    value: PortfolioTabs.game,
+    title: "Games",
+    description: "Games I have worked on",
+    projects: [],
+  },
+];
 
 export type User = {
   id: string;
@@ -58,7 +58,7 @@ export type Invoice = {
   date: string;
   // In TypeScript, this is called a string union type.
   // It means that the "status" property can only be one of the two strings: 'pending' or 'paid'.
-  status: 'pending' | 'paid';
+  status: "pending" | "paid";
 };
 
 export type Revenue = {
@@ -75,7 +75,7 @@ export type LatestInvoice = {
 };
 
 // The database returns a number for amount, but we later format it to a string with the formatCurrency function
-export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
+export type LatestInvoiceRaw = Omit<LatestInvoice, "amount"> & {
   amount: number;
 };
 
@@ -87,7 +87,7 @@ export type InvoicesTable = {
   image_url: string;
   date: string;
   amount: number;
-  status: 'pending' | 'paid';
+  status: "pending" | "paid";
 };
 
 export type CustomersTableType = {
@@ -119,23 +119,22 @@ export type InvoiceForm = {
   id: string;
   customer_id: string;
   amount: number;
-  status: 'pending' | 'paid';
+  status: "pending" | "paid";
 };
 
-
 export type PortfolioPanel = {
-    id: string;  
-    value: number;
-    title: string;
-    description: string;
-    projects: Project[];
-}
+  id: string;
+  value: number;
+  title: string;
+  description: string;
+  projects: Project[];
+};
 
 export type TabPanelProps = {
   children?: React.ReactNode;
   index: number;
   value: number;
-}
+};
 
 export const SkillLevel = [1, 2, 3, 4, 5];
 
@@ -144,7 +143,7 @@ export type Skill = {
   name: string;
   icon_url: string;
   level: 1 | 2 | 3 | 4 | 5;
-}
+};
 
 // export type SkillTable = {
 //   id: string;
@@ -159,7 +158,7 @@ export type Project = {
   description: string;
   image_url: string;
   alt: string;
-  type: 'web_development' | 'game' | 'ui_design'
+  type: "web_development" | "game" | "ui_design";
   skills: Skill[];
 };
 

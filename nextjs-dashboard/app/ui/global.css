@@ -2,23 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-input[type='number'] {
+input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
 
-input[type='number']::-webkit-inner-spin-button {
+input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type='number']::-webkit-outer-spin-button {
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
 .nav {
-  background-color: #0005276e; 
+  background-color: #0005276e;
 }
 
 .background {
@@ -28,13 +28,14 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 .background::before {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgb(146 99 146 / 87%), rgb(8 9 13 / 99%)), url(/MoodySky.jpg);
+  background: linear-gradient(rgb(95 105 149 / 86%), rgb(8 9 13 / 99%)),
+    url(/MoodySky.jpg);
   background-size: cover;
   background-position: bottom;
   opacity: 1;
@@ -42,13 +43,14 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 .background::after {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgb(26 0 66 / 32%), rgb(8 9 13 / 52%)), url(/CreativeDevStudiosBackground.jpg);
+  background: linear-gradient(rgb(52 52 53 / 0%), rgb(129 66 163 / 35%)),
+    url(/CreativeDevStudiosBackground.jpg);
   background-size: cover;
   background-position: center;
   opacity: 0.3;
@@ -62,12 +64,18 @@ input[type='number']::-webkit-outer-spin-button {
   padding: 0 15px;
 }
 
-.portfolio_backdrop{
+.portfolio_backdrop {
   overflow-x: hidden;
 }
 
 .gallery {
-  transition: transform 0.5s ease-in-out; /* Smooth transition */
+  opacity: 0;
+  transition: opacity 0.9s ease-in-out;
+}
+
+.gallery.visible {
+  opacity: 1;
+  transition: opacity 0.9s ease-in-out;
 }
 
 .gallery_title {
@@ -92,14 +100,10 @@ input[type='number']::-webkit-outer-spin-button {
   overflow: hidden;
 }
 
-.gallery_edit_button{
-  color: rgb(187, 9, 39)195, 12, 43);
-}
-
-.move-left {
-  transform: translateX(-1200px);
-}
-
-.move-right {
-  transform: translateX(1200px);
+.skills-component {
+  background-color: #170117cc;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 5px 3px;
 }

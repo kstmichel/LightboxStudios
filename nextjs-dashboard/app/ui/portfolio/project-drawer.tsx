@@ -1,10 +1,10 @@
-
-import Drawer from '@mui/material/Drawer';
+import React from 'react';
+import Drawer from "@mui/material/Drawer";
 
 export default async function ProjectDrawer() {
-    return (
-        <Drawer>
-            <h1>Drawer</h1>
-        </Drawer>
-    );
-};
+  return (
+    <Drawer>
+      <h1>Drawer</h1>
+    </Drawer>
+  );
+}

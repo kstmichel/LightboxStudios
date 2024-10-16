@@ -1,15 +1,12 @@
-import Link from 'next/link';
-import NavLinks from '@/app/ui/dashboard/nav-links';
-import CreativeDevStudioLogo from '@/app/ui/brand-logo';
-import { PowerIcon } from '@heroicons/react/24/outline';
+import Link from "next/link";
+import NavLinks from "@/app/ui/dashboard/nav-links";
+import CreativeDevStudioLogo from "@/app/ui/brand-logo";
+import { PowerIcon } from "@heroicons/react/24/outline";
 
 export default function Navigation() {
   return (
     <div className="container flex h-full flex-row">
-      <Link
-        className="flex h-20 items-center justify-start"
-        href="/"
-      >
+      <Link className="flex h-20 items-center justify-start" href="/">
         <div className="w-70 text-white">
           <CreativeDevStudioLogo />
         </div>

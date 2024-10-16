@@ -1,36 +1,19 @@
-'use server';
+"use client";
 
-import React from 'react';
-import {Link, Breadcrumbs} from '@mui/material';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { portfolioPanels } from "@/app/lib/definitions";
 
-export default async function Page({
-    searchParams,
-  }: {
-    searchParams?: {
-      query?: string;
-      page?: string;
-    };
-  }) {
+const PortfolioIndexPage = () => {
+  const router = useRouter();
+  const initialCategory = portfolioPanels[0].id;
 
-    return(
-        <div className="container pt-6 w-full">
-            <Breadcrumbs aria-label="breadcrumb">
-                <Link color="inherit" href="/dashboard/portfolio">
-                    Portfolio
-                </Link>
-                <Link color="textPrimary" href="/dashboard/portfolio/project/create" aria-current="page">
-                    Create Project
-                </Link>
-            </Breadcrumbs>
-          
-            <div className="w-3/4">
-                <Link href='/dashboard/portfolio/project/create'>Create Project</Link>
-            </div>
-    
-            <div id="project-drawer" className='w-1/4'>
-                More information about the focused project
-            </div>
-        </div>
-    );
-    
+  useEffect(() => {
+    console.log("Redirecting to", `/portfolio/${initialCategory}`);
+    router.replace(`/portfolio/${initialCategory}`);
+  }, [router, initialCategory]);
+
+  return null;
 };
+
+export default PortfolioIndexPage;
