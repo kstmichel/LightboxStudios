@@ -1,3 +1,4 @@
+import { grey, pink, purple } from "@mui/material/colors";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -12,24 +13,25 @@ const config: Config = {
         "13": "repeat(13, minmax(0, 1fr))",
       },
       colors: {
+        active: {
+          light: pink[600],
+          DEFAULT: pink[800],
+          dark: pink[900],
+        },
         primary: {
-          light: "#f2f7f8",
-          DEFAULT: "#0070F3",
-          dark: "#282351",
+          light: purple[600],
+          DEFAULT: purple[800],
+          dark: purple[900],
         },
         secondary: {
-          light: "#cfd2e5",
-          DEFAULT: "#040508",
-          dark: "#000000",
+          light: grey[400],
+          DEFAULT: grey[700],
+          dark: grey[900],
         },
-        blue: {
-          300: "#f2f7f8",
-          400: "#cfd2e5",
-          500: "#0070F3",
-          600: "#282351",
-        },
-        grey: {
-          600: "#040508",
+        default: {
+          light: grey[300],
+          DEFAULT: grey[800],
+          dark: grey[900],
         },
       },
     },
