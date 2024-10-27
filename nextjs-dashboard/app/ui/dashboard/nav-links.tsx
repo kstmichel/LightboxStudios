@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
@@ -9,9 +10,9 @@ export default function NavLinks() {
   const pathname = usePathname();
 
   const links = [
-    { name: "about", href: "/dashboard" },
-    { name: "portfolio", href: "/portfolio" },
-    { name: "resume", href: "/resume" },
+    { name: "About", href: "/dashboard" },
+    { name: "Portfolio", href: "/portfolio" },
+    { name: "Resume", href: "/resume" },
   ];
 
   return (
@@ -19,15 +20,15 @@ export default function NavLinks() {
       {links.map((link) => {
         const linkColor =
           pathname === link.href || (pathname && pathname.includes(link.href))
-            ? "text-orange-400"
-            : "text-blue-400";
+            ? "text-pink-600"
+            : "text-secondary";
 
         return (
           <Link
             key={link.name}
             href={link.href}
             className={clsx(
-              `flex h-[48px] ${roboto.className} grow items-center justify-center p-3 text-sm font-medium hover:text-blue-300 md:flex-none md:justify-start md:p-2 md:px-3 ${linkColor}`,
+              `flex h-[48px] ${roboto.className} grow items-center justify-center p-3 text-sm font-medium md:flex-none md:justify-start md:p-2 md:px-3 ${linkColor}`,
             )}
           >
             {/* <LinkIcon className="w-6" /> */}

@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --max-container-width: 1000px;
+  --linear-dark-gradient: linear-gradient(rgb(58 55 53), rgb(8 9 13));
+}
+
+body {
+  background: var(--linear-dark-gradient);
+}
+
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
@@ -18,33 +27,70 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .nav {
-  background-color: #0005276e;
+  background: linear-gradient(180deg, #f3f3f3 93%, #9e8798f5 100%);
+  border-bottom: 1px solid #fffffff2;
+}
+
+.gallery_tabs{
+  position: absolute;
+  top: 82px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  float: left;
+  width: 100%;
+  text-align: left;
+  background-color: #000e1c;
+
+  .MuiTabs-scroller {
+    width: 100%;
+    max-width: var(--max-container-width);
+    margin: 0 auto;
+    padding: 0 15px;
+  }
 }
 
 .background {
   position: relative;
   width: 100%;
-  height: 100vh;
+  z-index: -1;
 }
 
-.background::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(rgb(95 105 149 / 86%), rgb(8 9 13 / 99%)),
-    url(/MoodySky.jpg);
-  background-size: cover;
-  background-position: bottom;
-  opacity: 1;
-  z-index: -1;
+.dark-to-light {
+  display: inline-block;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 100px;
+    pointer-events: none;
+    background-color: #0d142d70;
+    transition: background-color 1s;
+  }
+
+  &.active::after {
+    background-color: transparent;
+    transition: background-color 1s;
+  }
+}
+
+.dark-to-light img {
+  display: block;
+  height: auto;
+}
+
+.custom-backdrop {
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust the color and opacity as needed */
 }
 
 .background::after {
   content: "";
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -52,26 +98,52 @@ input[type="number"]::-webkit-outer-spin-button {
   background: linear-gradient(rgb(52 52 53 / 0%), rgb(129 66 163 / 35%)),
     url(/CreativeDevStudiosBackground.jpg);
   background-size: cover;
-  background-position: center;
-  opacity: 0.3;
+  background-position: 100% 75%;
   z-index: -1;
+}
+
+.banner {
+  border-bottom: 1px solid #6e6e6e;
+}
+
+.floating-panel {
+  position: absolute;
+  width: 100%;
+  right: 0;
+  left: 0;
 }
 
 .container {
   width: 100%;
-  max-width: 1000px;
+  max-width: var(--max-container-width);
   margin: 0 auto;
   padding: 0 15px;
 }
 
+.theme_field{
+  font-size: text-sm;
+  font-weight: font-normal;
+  line-height: leading-5;
+  padding: 3px 2px;
+  border: 1px solid #d2d6dc;
+  border-radius: 0.375rem;
+  color: default;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
 .portfolio_backdrop {
-  overflow-x: hidden;
+  position: relative;
 }
 
 .gallery {
   opacity: 0;
   transition: opacity 0.9s ease-in-out;
 }
+
+.gallery-wrapper{
+  margin-top: -180px;
+ }
 
 .gallery.visible {
   opacity: 1;
@@ -100,10 +172,16 @@ input[type="number"]::-webkit-outer-spin-button {
   overflow: hidden;
 }
 
-.skills-component {
-  background-color: #170117cc;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 5px 3px;
+.icon_button_outlined {
+  float: right;
+  border: 3px solid #fff;
+  border-radius: 300px;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.box-dark-mode {
+  background-color: #504b54;
+
+  /* background: linear-gradient(rgb(58 55 53), rgb(8 9 13));  this was nice for page background*/  
 }
