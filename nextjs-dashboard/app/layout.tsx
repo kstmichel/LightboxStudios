@@ -1,3 +1,4 @@
+import React from 'react';
 import "@/app/ui/global.css";
 import { inter } from "@/app/ui/fonts";
 
@@ -8,7 +9,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} background antialiased text-white`}>
+      <body className={`${inter.className}glob antialiased text-white`}>
         {children}
       </body>
     </html>
