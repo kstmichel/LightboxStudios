@@ -1,8 +1,9 @@
 "use server";
-import { object, string, array, coerce, enum as zodEnum } from "zod"; // used to validate form data
+import { object, string, array as zodArray, coerce, enum as zodEnum } from "zod"; // used to validate form data
 import { sql } from "@vercel/postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { UUID } from "./definitions";
 
 export type State = {
   errors?: {
@@ -20,7 +21,7 @@ export type ProjectState = {
     image_url?: string[];
     alt?: string[];
     type?: string[];
-    skills?: string[];
+    skills?: UUID[];
   };
   message?: string | null;
 };
@@ -44,8 +45,7 @@ const ProjectFormSchema = object({
   type: zodEnum(["web_development", "game", "ui_design"], {
     invalid_type_error: "Please select a project type.",
   }),
-  skills: array(string())
-    .nonempty({ message: "Please select at least one skill." }),
+  skills: zodArray(string()).nonempty({ message: "Please select at least one skill." }),
 });
 
 const CreateProject = ProjectFormSchema.omit({ id: true });
@@ -55,7 +55,7 @@ export async function createProject(
   prevState: ProjectState,
   formData: FormData,
 ) {
-  console.log("createProject:", formData, prevState);
+  console.log("createProject:", formData, formData.get("skills"));
 
   const validatedFields = CreateProject.safeParse({
     title: formData.get("title"),
@@ -63,8 +63,10 @@ export async function createProject(
     image_url: formData.get("image_url"),
     alt: formData.get("alt"),
     type: formData.get("type"),
-    skills: formData.getAll("skills"),
+    skills: formData.get("skills"),
   });
+
+  console.log("validatedFields.success:", validatedFields.success);
 
   if (!validatedFields.success) {
     return {
@@ -74,14 +76,19 @@ export async function createProject(
   }
 
   // Prepare data for insertion into the database
-  const { title, description, image_url, alt, type, skills } =
-    validatedFields.data;
+  const { title, description, image_url, alt, type, skills }: { title: string; description: string; image_url: string; alt: string; type: string; skills: UUID[] } = 
+      validatedFields.data;
 
   try {
+    console.log("INSERT", `
+      INSERT INTO projects (title, description, image_url, alt, type, skills)
+      VALUES (${title}, ${description}, ${image_url}, ${alt}, ${type}, {${skills.join(',')}})
+  ` );
     await sql`
             INSERT INTO projects (title, description, image_url, alt, type, skills)
-            VALUES (${title}, ${description}, ${image_url}, ${alt}, ${type}, ${skills.toString()})
+            VALUES (${title}, ${description}, ${image_url}, ${alt}, ${type}, {${skills.join(',')}})
         `;
+     
   } catch (error) {
     console.log("error inserting data", error);
 
@@ -99,7 +106,7 @@ export async function createProject(
 }
 
 export async function editProject(prevState: ProjectState, formData: FormData) {
-  console.log("editProject:", formData, prevState);
+  console.log("editProject:", formData, formData.getAll("skills"));
 
   const validatedFields = EditProject.safeParse({
     id: formData.get("id"),
@@ -128,7 +135,7 @@ export async function editProject(prevState: ProjectState, formData: FormData) {
   }
 
   // Prepare data for insertion into the database
-  const { id, title, description, image_url, alt, type, skills } =
+  const { id, title, description, image_url, alt, type, skills }: { id: string, title: string; description: string; image_url: string; alt: string; type: string; skills: UUID[] } = 
     validatedFields.data;
   console.log("skills prior to update", skills, skills.toString());
 

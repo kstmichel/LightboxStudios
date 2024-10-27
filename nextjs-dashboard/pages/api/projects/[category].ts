@@ -20,6 +20,7 @@ export default async function handler(
   }
 
   try {
+    console.log('API hit for category:', category, 'page:', pageNumber);
     const projects = await fetchProjectsByPortfolioCategory(
       category,
       pageNumber,

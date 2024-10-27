@@ -117,6 +117,9 @@ export async function fetchProjectsByPortfolioCategory(
   page: number,
 ): Promise<ProjectData[]> {
   try {
+    await new Promise((resolve) => setTimeout(resolve, 6000));
+
+    console.log('fetching by portfolio cateogry, query:', query, 'page:', page);
     const data = await sql<ProjectData>`SELECT * FROM projects
       WHERE type ILIKE ${`%${query}%`}
       ORDER BY title ASC

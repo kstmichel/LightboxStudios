@@ -2,13 +2,16 @@ import React from "react";
 import Form from "@/app/ui/portfolio/project/create-form";
 import { fetchSkills } from "@/app/lib/data";
 
-export default async function Page() {
+interface PageProps {
+  onClose: () => void;
+}
+
+export default async function Page({ onClose }: PageProps) {
   const skills = await fetchSkills();
 
   return (
-    <div>
-      <h1>Create Project Page</h1>
-      <Form skills={skills} />
+    <div className="container mt-12">
+      <Form skills={skills} onClose={() => onClose} />
     </div>
   );
 }

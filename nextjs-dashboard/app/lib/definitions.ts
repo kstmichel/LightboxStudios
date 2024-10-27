@@ -18,7 +18,7 @@ export const portfolioPanels: PortfolioPanel[] = [
     id: "web_development",
     value: PortfolioTabs.web_development,
     title: "Web Development",
-    description: "Projects I have worked on",
+    description: "Check out some of the web development projects I've worked on, each one focused on clean, responsive design and a smooth user experience. Click on any project to dive deeper, learn more about the process, and even review the code on GitHub.",
     projects: [],
   },
   {
