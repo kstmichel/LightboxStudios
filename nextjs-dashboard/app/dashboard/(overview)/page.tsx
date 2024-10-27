@@ -11,7 +11,7 @@ import {
 
 export default async function Page() {
   return (
-    <main className="flex min-h-screen flex-col p-6">
+    <main className="container flex min-h-screen flex-col p-6">
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
         Dashboard
       </h1>
