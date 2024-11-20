@@ -26,16 +26,20 @@ export default function Page() {
                 href="/login"
                 variant="contained"
                 size="large"
-                className={`visible text-white transition-colors ${letThereBeLight ? 'bg-active' : 'bg-gray-800'}`}
+                className={`visible text-white transition-all 
+                    ${letThereBeLight ? 'bg-active hover:bg-active-dark' 
+                      : 'bg-gray-800'}`}
                  >
                 Log in
               </Button>
 
               <Button
-                href="/portfolio"
+                href="/portfolio/web_development"
                 variant="outlined"
                 size="large"
-                className={`visible transition-colors ${letThereBeLight ? 'text-active border-active' : 'text-gray-800 border-gray-800'}`}
+                className={`visible transition-all 
+                  ${letThereBeLight ? 'text-active border-active hover:border-active-dark' 
+                    : 'text-gray-800 border-gray-800'}`}
               >
                 Continue As Guest
               </Button>

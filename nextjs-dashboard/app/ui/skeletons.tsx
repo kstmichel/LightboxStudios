@@ -1,4 +1,5 @@
 import React from 'react';
+import { Grid } from '@mui/material';
 
 // Loading animation
 const shimmer =
@@ -45,15 +46,20 @@ export function SkillsSkeleton() {
 export function PortfolioSkeleton() {
   return (
     <>
-      <div
-        className={`${shimmer} relative mb-4 h-8 w-36 overflow-hidden rounded-md bg-gray-100`}
+    <Grid 
+        container 
+        spacing={2}
       >
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Grid item xs={12} sm={6} md={4}>
           <CardSkeleton />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
           <CardSkeleton />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
           <CardSkeleton />
-        </div>
-      </div>
+        </Grid>
+      </Grid>
     </>
   );
 }
