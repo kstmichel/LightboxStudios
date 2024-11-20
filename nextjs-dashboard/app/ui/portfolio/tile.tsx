@@ -29,9 +29,9 @@ interface TileProps {
 }
   
 const Tile: React.FC<TileProps> = ({ project, onAction }) => {   
-    if (!project) return <Card>Project not found</Card>;
-    
     const cardRef = useRef(null);
+
+    if (!project) return <Card>Project not found</Card>;
 
     const actions = [
       { 

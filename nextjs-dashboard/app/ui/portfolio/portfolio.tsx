@@ -21,13 +21,13 @@ import { roboto } from "@/app/ui/fonts";
 import { PortfolioSkeleton } from "../skeletons";
 
 interface TabNavigationProps {
-  category: PortfolioCategoryKeys;
+  category: PortfolioCategoryKeys | null;
   page: number;
   skillsLibrary: Skill[];
 }
 
 const Portfolio = ({ category, page, skillsLibrary }: TabNavigationProps) => {
-  const [activeTab, setActiveTab] = useState<number>(Object.keys(PortfolioCategoryId).indexOf(category));
+  const [activeTab, setActiveTab] = useState<number>(Object.keys(PortfolioCategoryId).indexOf(category || PortfolioCategoryId.web_development));
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');

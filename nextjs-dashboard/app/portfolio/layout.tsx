@@ -1,12 +1,11 @@
 import React from 'react';
-import Navigation from "@/app/ui/dashboard/navigation";
+import Navigation from "@/app/ui/navigation";
 
 export const experimental_ppr = true;
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div
-      id="dashboard-layout"
       className="layout flex flex-col"
     >
       <div className="nav w-full flex-none">

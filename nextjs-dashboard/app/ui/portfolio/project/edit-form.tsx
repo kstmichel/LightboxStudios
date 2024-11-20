@@ -36,10 +36,10 @@ export default function Form({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData: FormData = new FormData(e.target as HTMLFormElement);
 
-    if(!project.id || !formData) {
+    if (!project.id || !formData) {
       onError('Project or formData is missing');
       return;
-    };
+    }
 
     // add selected skills to formData
     formData.set("skills", selectedSkills.map((skill) => skill.id).join(','));
