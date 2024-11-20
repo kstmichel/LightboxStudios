@@ -1,5 +1,6 @@
 import { grey, pink, purple } from "@mui/material/colors";
 import type { Config } from "tailwindcss";
+import forms from "@tailwindcss/forms";
 
 const config: Config = {
   content: [
@@ -14,6 +15,7 @@ const config: Config = {
       },
       colors: {
         active: {
+          lightest: pink[50],
           light: pink[600],
           DEFAULT: pink[800],
           dark: pink[900],
@@ -42,7 +44,7 @@ const config: Config = {
         },
       },
     },
+  plugins: [forms],
   },
-  plugins: [require("@tailwindcss/forms")],
 };
 export default config;
