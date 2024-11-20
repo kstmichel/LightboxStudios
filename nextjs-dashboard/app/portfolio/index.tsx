@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { portfolioPanels } from "@/app/lib/definitions";
+import { portfolioPanelData } from "@/app/lib/definitions";
 
 const PortfolioIndexPage = () => {
   const router = useRouter();
-  const initialCategory = portfolioPanels[0].id;
+  const initialCategory = portfolioPanelData[0].id;
 
   useEffect(() => {
     console.log("Redirecting to", `/portfolio/${initialCategory}`);

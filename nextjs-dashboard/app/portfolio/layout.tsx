@@ -7,14 +7,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div
       id="dashboard-layout"
-      className="layout flex h-screen flex-col"
+      className="layout flex flex-col"
     >
       <div className="nav w-full flex-none">
         <Navigation />
       </div>
       <div className="main flex-grow">
-        <div className="h-60 w-full background banner bg-center" />
-        {children}
+          {children}
       </div>
     </div>
   );

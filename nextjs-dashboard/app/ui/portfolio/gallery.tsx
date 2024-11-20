@@ -1,111 +1,289 @@
 "use cache";
 import React, { useEffect, useState } from "react";
-import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 import {
-  ImageList,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  CardActionArea,
+  Grid,
   Typography,
+  Drawer,
+  Box,
 } from "@mui/material";
-import { Edit } from "@mui/icons-material";
-// import Skills from "./skills";
-import { Project } from "app/lib/definitions";
+import { Add } from "@mui/icons-material";
+import { Project, Skill, PortfolioCategoryKeys } from "app/lib/definitions";
 import { roboto } from "app/ui/fonts";
 import { PortfolioSkeleton } from "app/ui/skeletons";
+import Skills from '@/app/ui/portfolio/skills';
+import DeleteDialog from "@/app/ui/portfolio/project/delete-dialog";
+import { default as CreateProject } from "@/app/ui/portfolio/project/create-form";
+import { default as EditProject } from "@/app/ui/portfolio/project/edit-form";
+import Tile from "@/app/ui/portfolio/tile";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+enum ProjectAction {
+  None,
+  View,
+  Edit,
+  Create,
+  Delete,
+}
+
+function ViewProject({project}: {project: Project}): JSX.Element {
+  return (
+    <Box sx={{ width: 400 }} role="presentation" className="p-5">
+      <Typography variant="h4">{project.title}</Typography>
+      <Typography variant="body1" className="mt-6">{project.description}</Typography>
+      <div className="mt-10">
+        <Typography variant="h6">Skills</Typography>
+        <Skills skills={project.skills} />
+      </div>
+      <div className="mt-10">
+        <Typography variant="h6">Github information here..</Typography>
+        </div>
+    </Box>
+  )
+}
 
 export default function Gallery({
   category,
   page,
-  projects,
-  updateProjectsByCategory,
+  skillsLibrary,
+  isActive,
   onError,
-  onViewMore,
-  onEdit,
+  onShowSnackbar,
 }: {
   category: string;
   page: number;
-  projects: Project[];
-  updateProjectsByCategory: (category: string, projects: Project[]) => void;
+  skillsLibrary: Skill[];
+  isActive: boolean,
   onError: (error: string) => void;
-  onViewMore: (project: Project) => void;
-  onEdit: (project: Project) => void;
+  onShowSnackbar: (message: string, severity: 'success' | 'error') => void;
 }) {
-  const [localProjects, setLocalProjects] = useState<Project[]>(projects);
+
+  const [loading, setLoading] = useState(false);
+  const [focusedProject, setFocusedProject] = useState<Project | null>(null);
+  const [localProjects, setLocalProjects] = useState<Project[] | null>(null);
+  const [action, setAction] = useState<ProjectAction>(ProjectAction.None);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Fetch the projects
   const { data: fetchedProjects, error } = useSWR(
-    projects.length === 0 ? `/api/projects/${category}?page=${page}&category=${category}` : null,
+    `/api/projects?category=${category}&page=${page}`,
     fetcher,
     {
       revalidateOnFocus: false,
       dedupingInterval: 60000, // 1 minute
-      initialData: projects,
     },
   );
 
-  useEffect(() => {
-    if (projects.length > 0) return;
-
-    if (fetchedProjects) {
-      setLocalProjects(fetchedProjects);
-      console.log("Setting local projects", fetchedProjects);
-      updateProjectsByCategory(category, projects);
+  // CRUD operations
+  const handleCreateProject = async (formData: FormData) => {
+    if(!formData) {
+        onError('No project to delete');
+        setLoading(false);
+        return { success: false, message: 'Project could not be created, please try again.' };
     }
-  }, [category, fetchedProjects, projects, updateProjectsByCategory]);
 
+    setLoading(true);
+    
+    try {
+    
+      const response = await fetch(`/api/projects/create`, {
+        method: 'POST',
+        body: formData,
+      }).then((res) => res.json());
+  
+      if (!response.success) {
+        onError('Failed to create project');
+        return;
+      }
+
+      mutate(`/api/projects?category=${category}&page=${page}`, true);
+      onShowSnackbar('Project was successfully created', 'success'); 
+      closeDrawer();     
+
+    } catch (error) {
+      console.error('Error creating project', error);
+      onError('Failed to create project');
+      return;
+    }
+
+    setLoading(false);
+  };
+
+  const handleUpdateProject = async (projectId: string, formData: FormData) => {
+    if(!projectId || !formData) {
+        onError('No project to delete');
+        setLoading(false);
+        return { success: false, message: 'No project to delete' };
+    }
+
+    setLoading(true);
+    
+    try {
+    
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'PUT',
+        body: formData,
+      }).then((res) => res.json());
+  
+      if (!response.success) {
+        onError('Failed to update project');
+        return;
+      }
+
+      mutate(`/api/projects?category=${category}&page=${page}`, true);
+      onShowSnackbar('Project was successfully updated', 'success'); 
+      closeDrawer();     
+
+    } catch (error) {
+      console.error('Error updating project', error);
+      onError('Failed to update project');
+      return;
+    }
+
+    setLoading(false);
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    setLoading(true);
+
+    if(!projectId) {
+        onError('No project to delete');
+        setLoading(false);
+        return { success: false, message: 'No project to delete' };
+    }
+
+    try {
+        const response = await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
+
+        if(response.ok) {
+          mutate(`/api/projects?category=${category}&page=${page}`, true);
+          onShowSnackbar('Project was successfully deleted', 'success');
+        } else {
+          throw new Error('Failed to delete project');
+        }
+
+    } catch (error: unknown) {
+        onError((error as Error).message ?? 'Error occurred during Project deletion.');
+    }
+
+  setLoading(false);
+};
+
+  useEffect(() => {
+    setLoading(true);
+
+    setLocalProjects(fetchedProjects);
+
+    setLoading(false);
+
+  }, [fetchedProjects]);
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+    setFocusedProject(null);
+    setAction(ProjectAction.None);
+  };
+
+  const onEventHandler = async (action: ProjectAction, project?: Project) => {
+    setFocusedProject(project || null);
+    setAction(action);
+
+    if (action === ProjectAction.Delete) {
+      setDeleteDialogOpen(true);
+    } else {
+      setDrawerOpen(true);
+    }
+  }
+
+  function CreateProjectButton(): JSX.Element {
+    return (
+      <div className="w-full flex justify-start md:justify-end items-center my-6">      
+        <div className='btn_color_change flex justify-end hover:cursor-pointer'
+          onClick={() => onEventHandler(ProjectAction.Create)} >
+          <Add 
+            className="icon_button_outlined text-white font-bold" 
+          />
+          <Typography variant="h6" className="text-white pl-2">Add Project</Typography>
+        </div>
+      </div>
+    )
+  }  
 
   if (error) {
     onError("Failed to load projects");
     return <div>Failed to load projects</div>;
   }
 
-  if (!fetchedProjects && projects.length === 0) return <PortfolioSkeleton />;
+  if (!localProjects || loading) return <PortfolioSkeleton />;
 
   return (
-    <div id={`gallery_${category}`} className={`gallery ${roboto}`}>
-      <ImageList
-        sx={{ width: "100%", height: "auto"}}
-        cols={3}
-        gap={8}
-        rowHeight={250}
+    <>
+      <DeleteDialog 
+        open={deleteDialogOpen} 
+        project={focusedProject}
+        onDeleteCancel={() => setDeleteDialogOpen(false)}
+        onDeleteProject={async (project?: Project) => {
+          if(!project || !project.id) return;
+
+          setDeleteDialogOpen(false);
+          await handleDeleteProject(project.id);  // Delete the project
+        }}
+        onDeleteError={onError}
+      />
+
+     <CreateProjectButton />
+
+     <Box sx={{ flexGrow: 1 }}
+          className={`gallery ${roboto.className} ${isActive && 'visible'}`}>
+      {
+        localProjects.length === 0 && !loading ? (
+            <Typography className='text-center' variant="h5">Check back later to see new projects!</Typography>
+      ) : (
+          <Grid container spacing={2}>
+              {
+                localProjects.length > 0 &&
+                localProjects.map((project: Project) => (
+                  project && (
+                    <Grid item xs={12} sm={6} md={4} key={project.id}>
+                      <Tile
+                        key={`project_${project.id}`}
+                        project={project}
+                        onAction={onEventHandler}
+                      />
+                    </Grid>
+                  )
+                ))
+              }
+          </Grid>
+        )
+      }
+    </Box>
+
+    <Drawer
+        anchor="right"
+        open={drawerOpen}
+        elevation={16}
+        onClose={() => closeDrawer()}
+        ModalProps={{
+          BackdropProps: {
+            className: 'custom-backdrop',
+          },
+        }}
       >
-        {localProjects.length > 0 &&
-          localProjects.map((project: Project) => (
-            <Card sx={{ maxWidth: 345 }} key={`card_${project.id}`}>
-              <CardActionArea onClick={() => onViewMore(project)}>
-                <CardMedia
-                  sx={{ height: 140 }}
-                  image={project.image_url}
-                  title={project.alt}
-                  style={{ position: "relative" }}
-                >
-                  {/* <Skills skills={project.skills} /> */}
-                </CardMedia>
+        {action === ProjectAction.View && focusedProject && (
+          <ViewProject project={focusedProject} />
+        )}
 
-                <CardContent>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {project.title}
-                  </Typography>
-                  
-                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                    {project.description}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
+        {action === ProjectAction.Edit && focusedProject && (
+          <EditProject project={focusedProject} skillsLibrary={skillsLibrary} onSubmit={handleUpdateProject} onError={onError} onClose={() => closeDrawer()} />
+        )}
 
-              <CardActions className="flex space-between w-full">
-                <Button size="small" onClick={() => onViewMore(project)}>Learn More</Button>
-                <Button className="gallery_edit_button" onClick={() => onEdit(project)}>
-                    <Edit />
-                </Button>
-              </CardActions>
-            </Card>
-          ))}
-      </ImageList>
-    </div>
+        {action === ProjectAction.Create && (
+          <CreateProject category={category as PortfolioCategoryKeys} skillsLibrary={skillsLibrary} onSubmit={handleCreateProject} onError={onError} onClose={() => closeDrawer()}  />
+        )}
+    </Drawer>
+    </>
   );
 }

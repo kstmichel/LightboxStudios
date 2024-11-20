@@ -1,201 +1,199 @@
 "use client";
-
-import React, { useActionState } from "react";
+import React, { useState } from "react";
 import {
   Button,
-  SelectChangeEvent,
   TextField,
-  TextareaAutosize,
   Box,
-  FormControl,
   FormLabel,
-  InputLabel,
-  Select,
   MenuItem,
+  Grid,
   Autocomplete,
-  Link,
+  CircularProgress,
 } from "@mui/material";
-import { Skill, Project, portfolioPanels } from "@/app/lib/definitions";
-import { editProject, ProjectState } from "@/app/lib/actions";
+import { Skill, Project, portfolioPanelData } from "@/app/lib/definitions";
+import {ValidationErrors, validateFields} from '@/app/lib/validation';
+
+interface EditFormProps{
+  project: Project;
+  skillsLibrary: Skill[];
+  onSubmit: (projectId: string, formData: FormData) => void;
+  onClose: () => void;
+  onError: (message: string) => void;
+}
 
 export default function Form({
   project,
-  skills,
-}: {
-  project: Project;
-  skills: Skill[];
-}) {
-  const initialState: ProjectState = { message: "", errors: {} };
-  const [state, formAction] = useActionState(editProject, initialState);
-  const [type, setType] = React.useState<string>(project.type);
-  const [selectedSkills, setSelectedSkills] = React.useState<Skill[]>(
-    project.skills || [],
-  );
+  skillsLibrary,
+  onSubmit,
+  onClose,
+  onError,
+}: EditFormProps) {
 
-  const handleTypeChange = (event: SelectChangeEvent<string>) => {
-    setType(event.target.value as string);
-  };
+  const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors]= useState<ValidationErrors>({})
+  const [selectedSkills, setSelectedSkills] = useState<Skill[]>(project.skills);
 
-  const handleSkillsSelect = (
-    event: React.SyntheticEvent<Element, Event>,
-    value: Skill[],
-  ) => {
-    // Update the state or perform other actions with the selected skills
-    setSelectedSkills(value);
-  };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData: FormData = new FormData(e.target as HTMLFormElement);
+
+    if(!project.id || !formData) {
+      onError('Project or formData is missing');
+      return;
+    };
+
+    // add selected skills to formData
+    formData.set("skills", selectedSkills.map((skill) => skill.id).join(','));
+
+    setLoading(true);
+    setValidationErrors({});
+    const validationErrors = validateFields(Object.fromEntries(formData.entries()));
+    if (Object.keys(validationErrors).length > 0) {
+      setValidationErrors(validationErrors);
+      setLoading(false);
+      return;
+    }
+
+    onSubmit(project.id, formData);
+    setLoading(false);
+  }
 
   return (
-    <div className="container w-full p-12">
-      <Box className="rounded-md bg-gray-50 p-4 md:p-6 max-w-3xl">
-        <form action={formAction}>
-          <h1 className="text-2xl font-bold text-black mb-6">Edit Project</h1>
-          <input type="hidden" name="id" value={project.id} />
-          <div className="mb-4 grid">
-            <FormControl fullWidth className="mb-6">
-              <FormLabel htmlFor="title">Title</FormLabel>
-              <TextField
-                type="text"
-                defaultValue={project.title}
-                id="title"
-                name="title"
-                required
-              />
+    <Box     
+      component="form"
+      className="rounded-md bg-gray-50 p-6 max-w-96 h-lvh"
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit(e);
+      }}  
+      >      
+        <h1 className="text-2xl font-bold text-black mb-6">Edit Project</h1>
+        <input type="hidden" name="id" value={project.id} />
+        <div id="errors" aria-live="polite" aria-atomic="true" className="mb-4" hidden={!validationErrors}>
+            {Object(validationErrors).entries > 0 && (
+               <p className="mt-2 text-sm text-active-light">Please resolve the following errors.</p>
+            )}
+        </div>
 
-              <div id="form-error" aria-live="polite" aria-atomic="true">
-                {state.errors?.title &&
-                  state.errors.title.map((error: string) => (
-                    <p className="mt-2 text-sm text-red-500" key={error}>
-                      {error}
-                    </p>
-                  ))}
-              </div>
-            </FormControl>
-
-            <FormControl fullWidth className="mb-6">
-              <FormLabel htmlFor="description">Description</FormLabel>
-              <TextareaAutosize
-                className="'w-80 text-sm font-normal leading-5 px-3 py-2 rounded-lg shadow-md shadow-slate-100 focus:shadow-outline-purple dark:focus:shadow-outline-purple focus:shadow-lg border border-solid border-slate-300 hover:border-purple-500 dark:hover:border-purple-500 focus:border-purple-500 dark:focus:border-purple-500 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-300 focus-visible:outline-0 box-border"
-                id="description"
-                defaultValue={project.description}
-                name="description"
-                maxRows={677}
-                required
-              />
-
-              <div id="form-error" aria-live="polite" aria-atomic="true">
-                {state.errors?.description &&
-                  state.errors.description.map((error: string) => (
-                    <p className="mt-2 text-sm text-red-500" key={error}>
-                      {error}
-                    </p>
-                  ))}
-              </div>
-            </FormControl>
-
-            <FormControl fullWidth className="mb-6">
-              <FormLabel htmlFor="image_url">Image URL</FormLabel>
-              <TextField
-                type="text"
-                id="image_url"
-                name="image_url"
-                defaultValue={project.image_url}
-                required
-              />
-              {/* 
-            <Typography className="text-black" hidden={!image}>{image}</Typography>
-            <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUploadIcon />}
-                className={'max-w-xs w-full'}
-              >
-                Upload Thumbnail
-                <VisuallyHiddenInput
-                  type="file"
-                  name="project-image"
-                  onChange={handleImageChange}
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+                <TextField
+                  id="title"
+                  name="title"
+                  label="Title"
+                  variant="standard"
+                  defaultValue={project.title}
+                  error={!!validationErrors?.title}
+                  fullWidth
+                  helperText={validationErrors?.title}
                 />
-              </Button> */}
-            </FormControl>
+             </Grid>
 
-            <FormControl fullWidth className="mb-6">
-              <FormLabel htmlFor="alt">Image Alt Text</FormLabel>
+             <Grid item xs={12}>
+                <TextField
+                  id="description"
+                  name="description"
+                  label="Description"
+                  variant="standard"
+                  defaultValue={project.description}
+                  error={!!validationErrors?.description}
+                  helperText={validationErrors?.description}
+                  fullWidth
+                  multiline
+                  maxRows={4}
+                />
+             </Grid>
+
+             <Grid item xs={12}>
+                <TextField
+                  id="image_url"
+                  name="image_url"
+                  label="Image Pathname"
+                  variant="standard"
+                  defaultValue={project.image_url}
+                  error={!!validationErrors?.image_url}
+                  helperText={validationErrors?.image_url}
+                  fullWidth
+                />
+             </Grid>
+
+             <Grid item xs={12}>
+                <TextField
+                  type="text"
+                  id="alt"
+                  name="alt"
+                  label="Image Description"
+                  variant="standard"
+                  defaultValue={project.alt}
+                  error={!!validationErrors?.alt}
+                  helperText={validationErrors?.alt}
+                  fullWidth
+                />
+            </Grid>
+
+            <Grid item xs={12}>
               <TextField
-                type="text"
-                id="alt"
-                name="alt"
-                defaultValue={project.alt}
-                required
-              />
-            </FormControl>
-
-            <FormControl fullWidth className="mb-6">
-              <InputLabel htmlFor="type" id="type">
-                Type
-              </InputLabel>
-              <Select
-                labelId="type"
                 id="type"
                 name="type"
-                value={type}
-                label={type}
-                onChange={handleTypeChange}
-                required
+                label="Category"
+                variant="standard"
+                defaultValue={project.type}
+                error={!!validationErrors?.type}
+                helperText={validationErrors?.type}
+                fullWidth
+                select
               >
-                {portfolioPanels.map((projectType) => (
-                  <MenuItem key={projectType.id} value={projectType.id}>
-                    {projectType.title}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                 {portfolioPanelData.map((panel) => (
+                    <MenuItem key={panel.id} value={panel.id}>
+                      {panel.title}
+                    </MenuItem>
+                  ))}
+              </TextField>
+            </Grid>
 
-            <FormControl fullWidth className="mb-6">
-              <div className="flex flex-wrap flex-col w-full">
-                <div id="search-skill">
-                  <FormLabel htmlFor="skills">Skills</FormLabel>
-                  <Autocomplete
-                    disablePortal
-                    options={skills}
-                    multiple={true}
-                    value={selectedSkills}
-                    onChange={handleSkillsSelect}
-                    getOptionLabel={(option) => option.name}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        id="skillsField"
-                        name="skillsField"
-                        className="mb-3"
-                      />
-                    )}
-                  />
-                  <input
-                    type="hidden"
-                    name="skills"
-                    value={selectedSkills.map((skill) => skill.id)}
-                  />
-                </div>
-                {/* <div id="add-skill">
-                  <TextField id="adkd-skill" name="add-skill" placeholder='Add Skill' />
-                </div> */}
-              </div>
-            </FormControl>
-          </div>
+            <Grid item xs={12}>
+                <FormLabel htmlFor="skills">Skills</FormLabel>
+                <Autocomplete
+                  aria-label="Skills"
+                  disablePortal
+                  className={`${validationErrors?.skills ? 'border-red-500' : ''}`}
+                  multiple={true}
+                  defaultValue={project.skills}
+                  options={skillsLibrary}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  onChange={(e, value) => setSelectedSkills([...value])}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      id="skills"
+                      name="skills"
+                      variant="standard"
+                      className="mb-3"
+                      error={!!validationErrors?.skills}
+                      helperText={validationErrors?.skills}
+                    />
+                  )}
+                />
+            </Grid>
+          </Grid>
 
-          <div id="form-actions" className="mt-6 flex justify-end gap-4">
-            <Link
-              href="/dashboard/portfolio"
-              className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+        <div id="form-actions" className="mt-6 flex justify-end gap-4">
+          <Button type="button" 
+            className={`bg-default hover:bg-default-dark text-white`} 
+            onClick={() => onClose()}  
+          >
+                Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            variant="contained" 
+            className="bg-primary hover:bg-active"
+            disabled={loading}
             >
-              Cancel
-            </Link>
-            <Button type="submit">Update Project</Button>
-          </div>
-        </form>
-      </Box>
-    </div>
+            {loading ? <CircularProgress size={24} /> : 'Save'}
+          </Button>
+        </div>
+    </Box>
   );
 }
