@@ -2,13 +2,11 @@
 import React from 'react';
 import Portfolio from '@/app/ui/portfolio/portfolio';
 import {
-  //  fetchProjectsByPortfolioCategory, 
    fetchSkills 
 } from '@/app/lib/data';
 import { 
   PortfolioCategoryKeys, 
   PortfolioCategoryId, 
-  // Project 
 } from '@/app/lib/definitions';
 
 export default async function CategoryPage({ params }: { params: { category: string } }) {

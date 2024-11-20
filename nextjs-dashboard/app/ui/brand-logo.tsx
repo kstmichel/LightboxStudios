@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { robotoCondensed } from "@/app/ui/fonts";
 
-export default function LightboxStudiosLogo({isActive}: {isActive: boolean}) {
+export default function LightboxStudiosLogo({isActive = false}: {isActive: boolean}) {
   return (
     <div
       className={`${robotoCondensed.className} flex flex-row flex-center items-center leading-none text-gray-800`}
