@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { fetchProjectsByPortfolioCategory, fetchSkills } from "app/lib/data"; // Adjust the import path as needed
-import { Project, Skill } from "@/app/lib/definitions"; // Adjust the import path as needed
+import { fetchProjectsByPortfolioCategory, fetchSkills } from "app/lib/data";
+import { Project, Skill } from "@/app/lib/definitions";
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +20,6 @@ export default async function handler(
   }
 
   try {
-    console.log('API hit for category:', category, 'page:', pageNumber);
     const projects = await fetchProjectsByPortfolioCategory(
       category,
       pageNumber,
