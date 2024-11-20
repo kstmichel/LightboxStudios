@@ -9,7 +9,7 @@ import {
   LatestInvoiceRaw,
   Revenue,
   Project,
-  ProjectData,
+  ProjectTable,
   Skill,
   UUID,
 } from "./definitions";
@@ -115,17 +115,18 @@ export async function fetchProjectById(projectId: UUID): Promise<Project> {
 export async function fetchProjectsByPortfolioCategory(
   query: string,
   page: number,
-): Promise<ProjectData[]> {
+): Promise<ProjectTable[]> {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 6000));
+    // await new Promise((resolve) => setTimeout(resolve, 12000));
 
-    console.log('fetching by portfolio cateogry, query:', query, 'page:', page);
-    const data = await sql<ProjectData>`SELECT * FROM projects
+    console.log('fetch projects, category:', query, 'page:', page);
+
+    const data = await sql<ProjectTable>`SELECT * FROM projects
       WHERE type ILIKE ${`%${query}%`}
       ORDER BY title ASC
-      LIMIT 3 OFFSET ${(page - 1) * 6}`;
+      LIMIT 6 OFFSET ${(page - 1) * 6}`;
 
-    return data.rows;
+    return data.rows as ProjectTable[];
   } catch (error) {
     console.error("Error fetching projects", error);
     return [];

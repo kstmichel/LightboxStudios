@@ -1,41 +1,111 @@
-// This file contains type definitions for your data.
-// It describes the shape of the data, and what data type each property should accept.
-// For simplicity of teaching, we're manually defining these types.
+import { fetchProjectsByPortfolioCategory } from "./data";
 
-// import { string } from "zod";
-
-// However, these types are generated automatically if you're using an ORM such as Prisma.
 export type UUID = string;
 
-export const PortfolioTabs: { [key: string]: number } = {
-  web_development: 0,
-  ui_design: 1,
-  game: 2,
+export interface FormFields {
+  [key: string]: FormDataEntryValue 
+}
+
+export const PortfolioCategoryId = {
+  web_development: 'web_development',
+  ui_design: 'ui_design',
+  games: 'games',
+}
+
+export type PortfolioCategoryKeys = keyof typeof PortfolioCategoryId;
+
+export type Project = {
+  id?: string;
+  title: string;
+  description: string;
+  image_url: string;
+  alt: string;
+  type: PortfolioCategoryKeys;
+  skills: Skill[];
 };
 
-export const portfolioPanels: PortfolioPanel[] = [
-  {
-    id: "web_development",
-    value: PortfolioTabs.web_development,
-    title: "Web Development",
-    description: "Check out some of the web development projects I've worked on, each one focused on clean, responsive design and a smooth user experience. Click on any project to dive deeper, learn more about the process, and even review the code on GitHub.",
-    projects: [],
-  },
-  {
-    id: "ui_design",
-    value: PortfolioTabs.ui_design,
-    title: "UI Designs",
-    description: "Designs I have worked on",
-    projects: [],
-  },
-  {
-    id: "games",
-    value: PortfolioTabs.game,
-    title: "Games",
-    description: "Games I have worked on",
-    projects: [],
-  },
+export type ProjectTable = Omit<Project, 'skills'> & {
+  skills: UUID[];
+};
+
+class PortfolioCategory {
+  id: string;
+  value: number;
+  title: string;
+  description: string;
+  page: number;
+  projects?: Project[];
+
+  constructor(id: string, value: number, title: string, description: string, page: number, projects: Project[] = []) {
+    this.id = id;
+    this.value = value;
+    this.title = title;
+    this.description = description;
+    this.page = page;
+    this.projects = projects;
+  }
+
+  async GetProjects () {
+    try {
+      const projects = await fetchProjectsByPortfolioCategory(this.id, 1);
+      return projects;
+  
+    } catch(error) {
+      console.log(`Error fetching projects for ${this.title} Web Development category`, error);
+      throw error;
+    }
+  }
+}
+
+class WebDevelopmentCategory extends PortfolioCategory {
+  constructor(page: number = 1) {
+    super(
+        PortfolioCategoryId.web_development,
+        Object.keys(PortfolioCategoryId).indexOf(PortfolioCategoryId.web_development),
+        "Web Development",
+        "Check out some of the web development projects I've worked on, each one focused on clean, responsive design and a smooth user experience. Click on any project to dive deeper, learn more about the process, and even review the code on GitHub.",
+        page
+    );
+  }
+}
+
+class UIDesignCategory extends PortfolioCategory {
+  constructor(page: number = 1) {
+    super(
+      PortfolioCategoryId.ui_design,
+      Object.keys(PortfolioCategoryId).indexOf(PortfolioCategoryId.ui_design),
+      "UI Designs",
+      "Designs I have worked on",
+      page
+    )
+  }
+}
+
+class GamesCategory extends PortfolioCategory {
+  constructor(page: number = 1) {
+    super(
+      PortfolioCategoryId.games,
+      Object.keys(PortfolioCategoryId).indexOf(PortfolioCategoryId.games),
+      "Games",
+      "Games I have worked on",
+      page
+    )
+  }
+}
+
+export const portfolioPanelData: PortfolioCategory[] = [
+  new WebDevelopmentCategory(),
+  new UIDesignCategory(),
+  new GamesCategory(),
 ];
+
+export type PortfolioPanel = {
+  id: string;
+  value: number;
+  title: string;
+  description: string;
+  projects?: Project[];
+};
 
 export type User = {
   id: string;
@@ -122,20 +192,6 @@ export type InvoiceForm = {
   status: "pending" | "paid";
 };
 
-export type PortfolioPanel = {
-  id: string;
-  value: number;
-  title: string;
-  description: string;
-  projects: Project[];
-};
-
-export type TabPanelProps = {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-};
-
 export const SkillLevel = [1, 2, 3, 4, 5];
 
 export type Skill = {
@@ -143,31 +199,4 @@ export type Skill = {
   name: string;
   icon_url: string;
   level: 1 | 2 | 3 | 4 | 5;
-};
-
-// export type SkillTable = {
-//   id: string;
-//   name: string;
-//   icon_url: string;
-//   level: number;
-// }
-
-export type Project = {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string;
-  alt: string;
-  type: "web_development" | "game" | "ui_design";
-  skills: Skill[];
-};
-
-export type ProjectData = {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string;
-  alt: string;
-  type: "web_development" | "game" | "ui_design";
-  skills: UUID[];
 };
