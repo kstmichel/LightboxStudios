@@ -103,7 +103,8 @@ export default function Gallery({
 
       mutate(`/api/projects?category=${category}&page=${page}`, true);
       onShowSnackbar('Project was successfully created', 'success'); 
-      closeDrawer();     
+      setAbandonWarning(false);
+      closeDrawer(true);     
 
     } catch (error) {
       console.error('Error creating project', error);
@@ -137,7 +138,8 @@ export default function Gallery({
 
       mutate(`/api/projects?category=${category}&page=${page}`, true);
       onShowSnackbar('Project was successfully updated', 'success'); 
-      closeDrawer();     
+      setAbandonWarning(false);
+      closeDrawer(true);     
 
     } catch (error) {
       console.error('Error updating project', error);
@@ -183,8 +185,8 @@ export default function Gallery({
 
   }, [fetchedProjects]);
 
-  const closeDrawer = () => {
-    if(abandonWarning) {
+  const closeDrawer = (isFormSubmit?: boolean) => {
+    if(!isFormSubmit && abandonWarning) {
       setAbandonEditFormDialogOpen(true);
       return;
     }
@@ -196,10 +198,6 @@ export default function Gallery({
 
   const closeAbandonDialog = () => {
     setAbandonEditFormDialogOpen(false);
-  }
-
-  const showAbandonDialog = () => {
-    setAbandonEditFormDialogOpen(true);
   }
 
   const handleAbandonWarningChange = (value: boolean) => {
@@ -220,12 +218,12 @@ export default function Gallery({
   function CreateProjectButton(): JSX.Element {
     return (
       <div className="w-full flex justify-start md:justify-end items-center my-6">      
-        <div className='btn_color_change flex justify-end hover:cursor-pointer'
+        <div className='btn_color_change flex align-middle justify-end hover:cursor-pointer'
           onClick={() => onEventHandler(ProjectAction.Create)} >
           <Add 
-            className="icon_button_outlined text-white font-bold" 
+            className="size-6 text-white font-bold" 
           />
-          <Typography variant="h6" className="text-white pl-2">Add Project</Typography>
+          <Typography variant="button" className="text-white pl-2">Add Project</Typography>
         </div>
       </div>
     )
@@ -259,7 +257,7 @@ export default function Gallery({
         onConfirm={() => {
           closeAbandonDialog();
           setAbandonWarning(false);
-          closeDrawer();
+          closeDrawer(true);
         }}
       />
 
@@ -295,7 +293,7 @@ export default function Gallery({
         anchor="right"
         open={drawerOpen}
         elevation={16}
-        onClose={closeDrawer}
+        onClose={() => closeDrawer(false)}
         ModalProps={{
           BackdropProps: {
             className: 'custom-backdrop',
@@ -307,11 +305,11 @@ export default function Gallery({
         )}
 
         {action === ProjectAction.Edit && focusedProject && (
-          <EditProject project={focusedProject} skillsLibrary={skillsLibrary} onSubmit={handleUpdateProject} onChangeOccurred={handleAbandonWarningChange} onAbandon={showAbandonDialog} onError={onError} onClose={closeDrawer} />
+          <EditProject project={focusedProject} skillsLibrary={skillsLibrary} onSubmit={handleUpdateProject} onChangesOccurred={handleAbandonWarningChange} onError={onError} onClose={closeDrawer} />
         )}
 
         {action === ProjectAction.Create && (
-          <CreateProject category={category as PortfolioCategoryKeys} skillsLibrary={skillsLibrary} onSubmit={handleCreateProject} onError={onError} onClose={closeDrawer}  />
+          <CreateProject category={category as PortfolioCategoryKeys} skillsLibrary={skillsLibrary} onChangesOccurred={handleAbandonWarningChange} onSubmit={handleCreateProject} onError={onError} onClose={closeDrawer}  />
         )}
     </Drawer>
     </>

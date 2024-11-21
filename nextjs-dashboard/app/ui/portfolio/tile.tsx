@@ -1,5 +1,5 @@
 
-import React, {useRef} from "react";
+import React from "react";
 import {
     Button,
     Card,
@@ -29,7 +29,6 @@ interface TileProps {
 }
   
 const Tile: React.FC<TileProps> = ({ project, onAction }) => {   
-    const cardRef = useRef(null);
 
     if (!project) return <Card>Project not found</Card>;
 
@@ -48,7 +47,6 @@ const Tile: React.FC<TileProps> = ({ project, onAction }) => {
   
     return (
       <Card 
-        ref={cardRef}
         key={project.id} 
       >
         <CardActionArea onClick={() => onAction(ProjectAction.View, project)}>
@@ -77,15 +75,17 @@ const Tile: React.FC<TileProps> = ({ project, onAction }) => {
               sx={{ position: 'absolute', bottom: 6, fontSize: '10px', right: 4 }}
               icon={<SpeedDialIcon />}
             >
-              {actions.map((action) => (
-                <SpeedDialAction
-                  key={`${project.id}_action_${action.name}`}
-                  icon={action.icon}
-                  tooltipTitle={action.name}
-                  className="hover:text-active hover:bg-active-lightest"
-                  onClick={action.onClick}
-                />
-              ))}
+              {actions.length > 0 && actions.map((action) => {
+                return (
+                  <SpeedDialAction
+                      key={`${project.id}_${action.name}`}
+                      icon={action.icon}
+                      tooltipTitle={action.name}
+                      className="hover:text-active hover:bg-active-lightest"
+                      onClick={action.onClick}
+                    />
+                );
+              })}
          </SpeedDial>
         </CardActions>
       </Card>

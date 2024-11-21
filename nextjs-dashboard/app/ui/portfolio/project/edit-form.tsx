@@ -7,19 +7,20 @@ import {
   FormLabel,
   MenuItem,
   Grid,
+  Typography,
   Autocomplete,
   CircularProgress,
 } from "@mui/material";
 import { Skill, Project, portfolioPanelData, PortfolioCategoryKeys } from "@/app/lib/definitions";
 import {ValidationErrors, validateClientFields} from '@/app/lib/validation';
+import { useDebouncedCallback } from "use-debounce";
 
 interface EditFormProps{
   project: Project;
   skillsLibrary: Skill[];
   onSubmit: (projectId: string, formData: FormData) => void;
   onChangesOccurred: (value: boolean) => void;
-  onAbandon: () => void;
-  onClose: () => void;
+  onClose: (isFormSubmit: boolean) => void;
   onError: (message: string) => void;
 }
 
@@ -28,48 +29,39 @@ export default function Form({
   skillsLibrary,
   onSubmit,
   onChangesOccurred,
-  onAbandon,
   onClose,
   onError,
 }: EditFormProps) {
 
   const [title, setTitle] = useState(project.title);
   const [description, setDescription] = useState(project.description);
-  const [imageUrl, setImageUrl] = useState(project.image_url);
+  const [image_url, setImage_url] = useState(project.image_url);
   const [alt, setAlt] = useState(project.alt);
   const [type, setType] = useState(project.type);
-  const [selectedSkills, setSelectedSkills] = useState<Skill[]>(project.skills);
+  const [skills, setSkills] = useState<Skill[]>(project.skills);
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors]= useState<ValidationErrors>({})
-  const [formChanged, setFormChanged] = useState(false);
-
-  useEffect(() => {
-    if(!formChanged) {
-      
-    }
-    
-    onChangesOccurred(formChangesOccurred());
-  }, [title, description, imageUrl, alt, type, selectedSkills]);
+  const [changesDetected, setChangesDetected] = useState<boolean>(false);
 
   const formChangesOccurred = (): boolean => {
     return (
       title !== project.title ||
       description !== project.description ||
-      imageUrl !== project.image_url ||
+      image_url !== project.image_url ||
       alt !== project.alt ||
       type !== project.type ||
-      selectedSkills !== project.skills
+      skills !== project.skills
     );
   }
 
-  const handleCloseDrawer = () => {
-    if(formChangesOccurred()){
-      onAbandon();
-      return;
-    }
+  useEffect(() => {
+    setChangesDetected(formChangesOccurred());
+    
+  }, [title, description, image_url, alt, type, skills]);
 
-    onClose();
-  };
+  useEffect(() => {
+    onChangesOccurred(changesDetected);
+  }, [changesDetected])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData: FormData = new FormData(e.target as HTMLFormElement);
@@ -80,7 +72,7 @@ export default function Form({
     }
 
     // add selected skills to formData
-    formData.set("skills", selectedSkills.map((skill) => skill.id).join(','));
+    formData.set("skills", skills.map((skill) => skill.id).join(','));
 
     setLoading(true);
     setValidationErrors({});
@@ -106,7 +98,7 @@ export default function Form({
             handleSubmit(e);
           }}  
       >      
-        <h1 className="text-2xl font-bold text-black mb-6">Edit Project</h1>
+        <Typography variant="h6" className="font-bold text-black mb-6">Edit Project</Typography>
         <input type="hidden" name="id" value={project.id} />
         <div id="errors" aria-live="polite" aria-atomic="true" className="mb-4" hidden={!validationErrors}>
             {Object(validationErrors).entries > 0 && (
@@ -121,8 +113,8 @@ export default function Form({
                   name="title"
                   label="Title"
                   variant="standard"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  defaultValue={project.title}
+                  onChange={useDebouncedCallback((e) => setTitle(e.target.value), 500)}
                   error={!!validationErrors?.title}
                   fullWidth
                   helperText={validationErrors?.title}
@@ -135,8 +127,8 @@ export default function Form({
                   name="description"
                   label="Description"
                   variant="standard"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  defaultValue={description}
+                  onChange={useDebouncedCallback((e) => setDescription(e.target.value), 500)}
                   error={!!validationErrors?.description}
                   helperText={validationErrors?.description}
                   fullWidth
@@ -151,8 +143,8 @@ export default function Form({
                   name="image_url"
                   label="Image Pathname"
                   variant="standard"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
+                  defaultValue={image_url}
+                  onChange={useDebouncedCallback((e) => setImage_url(e.target.value), 500)}
                   error={!!validationErrors?.image_url}
                   helperText={validationErrors?.image_url}
                   fullWidth
@@ -166,8 +158,8 @@ export default function Form({
                   name="alt"
                   label="Image Description"
                   variant="standard"
-                  value={alt}
-                  onChange={(e) => setAlt(e.target.value)}
+                  defaultValue={alt}
+                  onChange={useDebouncedCallback((e) => setAlt(e.target.value), 500)}
                   error={!!validationErrors?.alt}
                   helperText={validationErrors?.alt}
                   fullWidth
@@ -180,8 +172,8 @@ export default function Form({
                 name="type"
                 label="Category"
                 variant="standard"
-                value={type}
-                onChange={(e) => setType(e.target.value as PortfolioCategoryKeys)}
+                defaultValue={type}
+                onChange={useDebouncedCallback((e) => setType(e.target.value as PortfolioCategoryKeys), 500)}
                 error={!!validationErrors?.type}
                 helperText={validationErrors?.type}
                 fullWidth
@@ -202,8 +194,8 @@ export default function Form({
                   disablePortal
                   className={`${validationErrors?.skills ? 'border-red-500' : ''}`}
                   multiple={true}
-                  value={selectedSkills}
-                  onChange={(e, value) => setSelectedSkills([...value])}
+                  defaultValue={skills}
+                  onChange={(e, value) => setSkills([...value])}
                   options={skillsLibrary}
                   getOptionLabel={(option) => option.name}
                   isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -225,7 +217,7 @@ export default function Form({
         <div id="form-actions" className="mt-6 flex justify-end gap-4">
           <Button type="button" 
             className={`bg-default hover:bg-default-dark text-white`} 
-            onClick={handleCloseDrawer}  
+            onClick={() => onClose(false)}  
           >
                 Cancel
           </Button>

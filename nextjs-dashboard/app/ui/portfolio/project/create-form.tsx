@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   TextField,
@@ -8,25 +8,53 @@ import {
   MenuItem,
   Grid,
   Autocomplete,
-  CircularProgress
+  CircularProgress,
+  Typography
 } from "@mui/material";
 import { Skill, portfolioPanelData, PortfolioCategoryKeys } from "@/app/lib/definitions";
 import { ValidationErrors, validateClientFields } from '@/app/lib/validation';
-import { ProjectState } from "@/app/lib/actions";
 import { roboto } from "@/app/ui/fonts";
+import { useDebouncedCallback } from "use-debounce";
 
 interface CreateFormProps{
   category: PortfolioCategoryKeys,
   skillsLibrary: Skill[];
+  onChangesOccurred: (value: boolean) => void;
   onSubmit: (formData: FormData) => void;
   onError: (message: string) => void;
-  onClose: (state?: ProjectState) => void;
+  onClose: (isFormSubmit: boolean) => void;
 }
 
-export default function CreateForm({ category, skillsLibrary, onSubmit, onError, onClose }: CreateFormProps) {
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-  const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
+export default function CreateForm({ category, skillsLibrary, onChangesOccurred, onSubmit, onError, onClose }: CreateFormProps) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [image_url, setImage_url] = useState('');
+  const [alt, setAlt] = useState('');
+  const [type, setType] = useState(category);
+  const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors]= useState<ValidationErrors>({})
+  const [changesDetected, setChangesDetected] = useState<boolean>(false);
+
+  const formChangesOccurred = (): boolean => {
+    return (
+      title !== '' ||
+      description !== '' ||
+      image_url !== '' ||
+      alt !== '' ||
+      type !== category ||
+      skills.length > 0
+    );
+  }
+
+  useEffect(() => {
+    setChangesDetected(formChangesOccurred());
+    
+  }, [title, description, image_url, alt, type, skills]);
+
+  useEffect(() => {
+    onChangesOccurred(changesDetected);
+  }, [changesDetected])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData: FormData = new FormData(e.target as HTMLFormElement)
@@ -36,8 +64,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
     }
 
     // add selected skills to formData
-    formData.set("skills", selectedSkills.map((skill) => skill.id).join(','));
-    console.log('formData skills', formData.get('skills'));
+    formData.set("skills", skills.map((skill) => skill.id).join(','));
 
     // client-side field validation
     setLoading(true);
@@ -63,7 +90,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
         handleSubmit(e);
       }}
       >
-        <h1 className={`text-2xl font-bold text-black mb-6 ${roboto.className}`}>Create Project</h1>
+        <Typography variant="h6" className={`font-bold text-black mb-6 ${roboto.className}`}>Create Project</Typography>
           <div id="errors" aria-live="polite" aria-atomic="true" className="mb-4" hidden={!validationErrors}>
             {Object(validationErrors).entries > 0 && (
                <p className="mt-2 text-sm text-active-light">Please resolve the following errors.</p>
@@ -77,6 +104,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
                   name="title"
                   label="Title"
                   variant="standard"
+                  onChange={useDebouncedCallback((e) => setTitle(e.target.value), 500)}
                   error={!!validationErrors?.title}
                   fullWidth
                   helperText={validationErrors?.title}
@@ -89,6 +117,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
                   name="description"
                   label="Description"
                   variant="standard"
+                  onChange={useDebouncedCallback((e) => setDescription(e.target.value), 500)}
                   error={!!validationErrors?.description}
                   helperText={validationErrors?.description}
                   fullWidth
@@ -103,6 +132,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
                   name="image_url"
                   label="Image Pathname"
                   variant="standard"
+                  onChange={useDebouncedCallback((e) => setImage_url(e.target.value), 500)}
                   error={!!validationErrors?.image_url}
                   helperText={validationErrors?.image_url}
                   fullWidth
@@ -116,6 +146,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
                   name="alt"
                   label="Image Description"
                   variant="standard"
+                  onChange={useDebouncedCallback((e) => setAlt(e.target.value), 500)}
                   error={!!validationErrors?.alt}
                   helperText={validationErrors?.alt}
                   fullWidth
@@ -129,6 +160,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
                 label="Type"
                 variant="standard"
                 defaultValue={category}
+                onChange={useDebouncedCallback((e) => setType(e.target.value), 500)}
                 error={!!validationErrors?.type}
                 helperText={validationErrors?.type}
                 fullWidth
@@ -151,7 +183,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
                   options={skillsLibrary}
                   isOptionEqualToValue={(option, value) => option.id === value.id}
                   getOptionLabel={(option) => option.name}
-                  onChange={(e, value) => setSelectedSkills([...value])}
+                  onChange={(e, value) => setSkills([...value])}
                   className={`${validationErrors?.skills ? 'border-red-500' : ''}`}
                   renderInput={(params) => (
                     <TextField
@@ -169,7 +201,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
           </Grid>
 
         <div id="form-actions" className="mt-6 flex justify-end gap-4">
-          <Button type="button" className={`bg-default hover:bg-default-dark text-white`} onClick={() => onClose()}>Cancel</Button>
+          <Button type="button" className={`bg-default hover:bg-default-dark text-white`} onClick={() => onClose(false)}>Cancel</Button>
           <Button 
             type="submit" 
             variant="contained" 
