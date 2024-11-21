@@ -13,6 +13,7 @@ import { roboto } from "app/ui/fonts";
 import { PortfolioSkeleton } from "app/ui/skeletons";
 import Skills from '@/app/ui/portfolio/skills';
 import DeleteDialog from "@/app/ui/portfolio/project/delete-dialog";
+import AbandonFormDialog from "@/app/ui/portfolio/project/abandon-dialog";
 import { default as CreateProject } from "@/app/ui/portfolio/project/create-form";
 import { default as EditProject } from "@/app/ui/portfolio/project/edit-form";
 import Tile from "@/app/ui/portfolio/tile";
@@ -64,7 +65,9 @@ export default function Gallery({
   const [localProjects, setLocalProjects] = useState<Project[] | null>(null);
   const [action, setAction] = useState<ProjectAction>(ProjectAction.None);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [abandonEditFormDialogOpen, setAbandonEditFormDialogOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [abandonWarning, setAbandonWarning] = useState(false);
 
   // Fetch the projects
   const { data: fetchedProjects, error } = useSWR(
@@ -181,10 +184,27 @@ export default function Gallery({
   }, [fetchedProjects]);
 
   const closeDrawer = () => {
+    if(abandonWarning) {
+      setAbandonEditFormDialogOpen(true);
+      return;
+    }
+
     setDrawerOpen(false);
     setFocusedProject(null);
     setAction(ProjectAction.None);
   };
+
+  const closeAbandonDialog = () => {
+    setAbandonEditFormDialogOpen(false);
+  }
+
+  const showAbandonDialog = () => {
+    setAbandonEditFormDialogOpen(true);
+  }
+
+  const handleAbandonWarningChange = (value: boolean) => {
+    setAbandonWarning(value);
+  }
 
   const onEventHandler = async (action: ProjectAction, project?: Project) => {
     setFocusedProject(project || null);
@@ -233,6 +253,16 @@ export default function Gallery({
         onDeleteError={onError}
       />
 
+      <AbandonFormDialog 
+        open={abandonEditFormDialogOpen}
+        onCancel={() => closeAbandonDialog()}
+        onConfirm={() => {
+          closeAbandonDialog();
+          setAbandonWarning(false);
+          closeDrawer();
+        }}
+      />
+
      <CreateProjectButton />
 
      <Box sx={{ flexGrow: 1 }}
@@ -265,7 +295,7 @@ export default function Gallery({
         anchor="right"
         open={drawerOpen}
         elevation={16}
-        onClose={() => closeDrawer()}
+        onClose={closeDrawer}
         ModalProps={{
           BackdropProps: {
             className: 'custom-backdrop',
@@ -277,11 +307,11 @@ export default function Gallery({
         )}
 
         {action === ProjectAction.Edit && focusedProject && (
-          <EditProject project={focusedProject} skillsLibrary={skillsLibrary} onSubmit={handleUpdateProject} onError={onError} onClose={() => closeDrawer()} />
+          <EditProject project={focusedProject} skillsLibrary={skillsLibrary} onSubmit={handleUpdateProject} onChangeOccurred={handleAbandonWarningChange} onAbandon={showAbandonDialog} onError={onError} onClose={closeDrawer} />
         )}
 
         {action === ProjectAction.Create && (
-          <CreateProject category={category as PortfolioCategoryKeys} skillsLibrary={skillsLibrary} onSubmit={handleCreateProject} onError={onError} onClose={() => closeDrawer()}  />
+          <CreateProject category={category as PortfolioCategoryKeys} skillsLibrary={skillsLibrary} onSubmit={handleCreateProject} onError={onError} onClose={closeDrawer}  />
         )}
     </Drawer>
     </>
