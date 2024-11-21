@@ -36,32 +36,90 @@ body {
   z-index: -1;
 }
 
-.dark-to-light {
-  display: inline-block;
+.brand-logo--container {
   position: relative;
+}
+
+.brand-logo--images {
+  position: relative;
+  width: 170px;
+  height: 170px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    background-image: url(/logo/background.svg);
+    background-size: cover;
+    z-index: 1;
+    width: 170px;
+    height: 170px;
+  }
 
   &::after {
     content: '';
     position: absolute;
     top: 0;
+    right: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 100px;
-    pointer-events: none;
-    background-color: #0d142d70;
-    transition: background-color 1s;
-  }
-
-  &.active::after {
-    background-color: transparent;
-    transition: background-color 1s;
+    background-image: url(/logo/cover.svg);
+    background-size: cover;
+    z-index: 10;
+    width: 170px;
+    height: 170px;
   }
 }
 
-.dark-to-light img {
-  display: block;
-  height: auto;
+.brand-logo--mask-layer {
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  top: 5px;
+  right:0;
+  left:0;
+  mask-image: url(/logo/mask.svg);
+  mask-size: cover;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  background: #ffffff;
+  z-index: 1;
+}
+
+.illuminate {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  transition: background-color 1s;
+  animation: fadeIn 1s forwards;
+  background-color: #676767;
+
+  &.active{
+    transition: background-color 1s;
+    background-color: #ffe527;
+  }
+}
+
+.spinner-circle {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: conic-gradient(#ffe527 40%, #505050 0%);
+  transform: rotate(135deg);  
+  animation: spin 1.3s steps(2) .2s infinite;
+  -webkit-animation: spin 7s linear infinite;
+  z-index: 10;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .custom-backdrop {
