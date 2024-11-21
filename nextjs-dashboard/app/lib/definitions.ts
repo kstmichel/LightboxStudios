@@ -3,7 +3,7 @@ import { fetchProjectsByPortfolioCategory } from "./data";
 export type UUID = string;
 
 export interface FormFields {
-  [key: string]: FormDataEntryValue 
+  [key: string]: FormDataEntryValue | string[];
 }
 
 export const PortfolioCategoryId = {

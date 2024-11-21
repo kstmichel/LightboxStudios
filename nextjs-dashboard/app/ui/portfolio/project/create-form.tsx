@@ -11,7 +11,7 @@ import {
   CircularProgress
 } from "@mui/material";
 import { Skill, portfolioPanelData, PortfolioCategoryKeys } from "@/app/lib/definitions";
-import { ValidationErrors, validateFields } from '@/app/lib/validation';
+import { ValidationErrors, validateClientFields } from '@/app/lib/validation';
 import { ProjectState } from "@/app/lib/actions";
 import { roboto } from "@/app/ui/fonts";
 
@@ -42,7 +42,7 @@ export default function CreateForm({ category, skillsLibrary, onSubmit, onError,
     // client-side field validation
     setLoading(true);
     setValidationErrors({});
-    const validationErrors = validateFields(Object.fromEntries(formData.entries()));
+    const validationErrors = validateClientFields(Object.fromEntries(formData.entries()));
     if (Object.keys(validationErrors).length > 0) {
       setValidationErrors(validationErrors);
       setLoading(false);

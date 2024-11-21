@@ -1,39 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { createProject } from "app/lib/actions"; 
-import { PortfolioCategoryKeys} from "app/lib/definitions";
-import { z } from "zod"; // used to validate form data
+import { PortfolioCategoryKeys, ProjectTable} from "app/lib/definitions";
 import formidable from 'formidable';
+import { validateFieldsForServer } from "app/lib/validation";
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
-
-// Validation schema for Project form
-const ProjectFormSchema = z.object({
-    id: z.string(),
-    title: z.string({ required_error: "Please include a title." })
-      .trim()
-      .min(1, { message: "Title cannot be empty or just whitespace." }),  
-    description: z.string({ required_error: "Please include a description." })
-    .trim()
-    .min(1, { message: "Description cannot be empty or just whitespace." }),
-    image_url: z.string({ required_error: "Image is required." })
-    .trim()
-    .min(1, { message: "Image cannot be empty or just whitespace." }),
-    alt: z.string({ required_error: "Please include alt text." })
-      .trim()
-      .min(1, { message: "Alt text cannot be empty or just whitespace." }),
-    type: z.enum(["web_development", "game", "ui_design"], {
-      invalid_type_error: "Please select a project type.",
-    }),
-    skills: z.array(z.string())
-    .transform((skills) => skills.filter(skill => skill.trim() !== ""))
-    .refine((skills) => skills.length > 0, { message: "Please select at least one skill." }),
-  });
-  
-  const CreateProject = ProjectFormSchema;
   
   export default async function handler(
     req: NextApiRequest,
@@ -50,24 +25,18 @@ const ProjectFormSchema = z.object({
         
             try {
 
-                const validatedFields = CreateProject.safeParse({
-                    id: String(fields.id),
-                    title: String(fields.title),
-                    description: String(fields.description),
-                    image_url: String(fields.image_url),
-                    alt: String(fields.alt),
-                    type: String(fields.type),
-                    skills: fields.skills,
-                });
+                const validationResponse = await validateFieldsForServer(fields);
 
-                if (!validatedFields.success) {
-                return res.status(400).json({ errors: validatedFields.error.errors });
+                if (!validationResponse.success){
+                    return res.status(400).json({ errors: validationResponse.error });
                 }
 
+                const { data } = validationResponse;
+
                 const response = await createProject({
-                ...validatedFields.data,
-                type: validatedFields.data.type as PortfolioCategoryKeys
-                });
+                    ...data,
+                    type: data?.type as PortfolioCategoryKeys
+                    } as ProjectTable);
 
                 res.status(200).json(response);
 
