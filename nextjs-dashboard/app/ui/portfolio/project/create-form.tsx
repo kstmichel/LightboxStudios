@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Button,
   TextField,
@@ -36,7 +36,7 @@ export default function CreateForm({ category, skillsLibrary, onChangesOccurred,
   const [validationErrors, setValidationErrors]= useState<ValidationErrors>({})
   const [changesDetected, setChangesDetected] = useState<boolean>(false);
 
-  const formChangesOccurred = (): boolean => {
+  const formChangesOccurred = useCallback((): boolean => {
     return (
       title !== '' ||
       description !== '' ||
@@ -45,16 +45,16 @@ export default function CreateForm({ category, skillsLibrary, onChangesOccurred,
       type !== category ||
       skills.length > 0
     );
-  }
+  }, [title, description, image_url, alt, type, skills, category]);
 
   useEffect(() => {
     setChangesDetected(formChangesOccurred());
     
-  }, [title, description, image_url, alt, type, skills]);
+  }, [title, description, image_url, alt, type, skills, formChangesOccurred]);
 
   useEffect(() => {
     onChangesOccurred(changesDetected);
-  }, [changesDetected])
+  }, [changesDetected, onChangesOccurred])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData: FormData = new FormData(e.target as HTMLFormElement)
